@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class Grader implements GradingStep {
+public class MavenGrader implements Grader {
     private final Equalator equalator = new Equalator(1);
 
     @Override
@@ -34,5 +34,10 @@ public class Grader implements GradingStep {
             new Part3Grader(configuration).grade(git, exercise),
             new Part4Grader(equalator).grade(git, exercise)
         );
+    }
+
+    @Override
+    public String slugToRepoUrl(String slug) {
+        return "https://github.com/" + slug + "/maven_training";
     }
 }
