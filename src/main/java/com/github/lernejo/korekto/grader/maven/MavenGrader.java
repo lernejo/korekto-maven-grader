@@ -40,4 +40,9 @@ public class MavenGrader implements Grader {
     public String slugToRepoUrl(String slug) {
         return "https://github.com/" + slug + "/maven_training";
     }
+
+    @Override
+    public boolean needsWorkspaceReset() {
+        return true;
+    }
 }
