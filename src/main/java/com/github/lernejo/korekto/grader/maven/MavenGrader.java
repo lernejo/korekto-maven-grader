@@ -1,38 +1,55 @@
 package com.github.lernejo.korekto.grader.maven;
 
-import com.github.lernejo.korekto.grader.maven.parts.Part1Grader;
-import com.github.lernejo.korekto.grader.maven.parts.Part2Grader;
-import com.github.lernejo.korekto.grader.maven.parts.Part3Grader;
-import com.github.lernejo.korekto.grader.maven.parts.Part4Grader;
-import com.github.lernejo.korekto.toolkit.*;
-import com.github.lernejo.korekto.toolkit.misc.Equalator;
-import com.github.lernejo.korekto.toolkit.thirdparty.git.GitContext;
-import com.github.lernejo.korekto.toolkit.thirdparty.git.GitNature;
+import com.github.lernejo.korekto.grader.maven.parts.*;
+import com.github.lernejo.korekto.toolkit.GradePart;
+import com.github.lernejo.korekto.toolkit.Grader;
+import com.github.lernejo.korekto.toolkit.GradingConfiguration;
+import com.github.lernejo.korekto.toolkit.PartGrader;
+import com.github.lernejo.korekto.toolkit.misc.HumanReadableDuration;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class MavenGrader implements Grader {
-    private final Equalator equalator = new Equalator(1);
+public class MavenGrader implements Grader<LaunchingContext> {
+
+    private final Logger logger = LoggerFactory.getLogger(MavenGrader.class);
 
     @Override
-    public void run(GradingConfiguration gradingConfiguration, GradingContext context) {
-        Optional<GitNature> optionalGitNature = context.getExercise().lookupNature(GitNature.class);
-        if (optionalGitNature.isEmpty()) {
-            context.getGradeDetails().getParts().add(new GradePart("exercise", 0D, 4D, List.of("Not a Git project")));
-        } else {
-            GitNature gitNature = optionalGitNature.get();
-            context.getGradeDetails().getParts().addAll(gitNature.withContext(c -> grade(gradingConfiguration, c, context.getExercise())));
+    public void run(LaunchingContext context) {
+        context.getGradeDetails().getParts().addAll(grade(context));
+    }
+
+    @NotNull
+    @Override
+    public LaunchingContext gradingContext(GradingConfiguration configuration) {
+        return new LaunchingContext(configuration);
+    }
+
+    private Collection<? extends GradePart> grade(LaunchingContext context) {
+        return graders().stream()
+            .map(g -> applyPartGrader(context, g))
+            .collect(Collectors.toList());
+    }
+
+    private GradePart applyPartGrader(LaunchingContext context, PartGrader<LaunchingContext> g) {
+        long startTime = System.currentTimeMillis();
+        try {
+            return g.grade(context);
+        } finally {
+            logger.debug(g.name() + " in " + HumanReadableDuration.toString(System.currentTimeMillis() - startTime));
         }
     }
 
-    private Collection<? extends GradePart> grade(GradingConfiguration configuration, GitContext git, Exercise exercise) {
+    private Collection<PartGrader<LaunchingContext>> graders() {
         return List.of(
-            new Part1Grader(equalator).grade(git, exercise),
-            new Part2Grader().grade(git, exercise),
-            new Part3Grader(configuration).grade(git, exercise),
-            new Part4Grader(equalator).grade(git, exercise)
+            new Part1Grader(),
+            new Part2Grader(),
+            new Part3Grader(),
+            new Part4Grader()
         );
     }
 
