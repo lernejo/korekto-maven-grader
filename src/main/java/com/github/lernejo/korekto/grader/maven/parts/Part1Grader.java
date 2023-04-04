@@ -2,9 +2,13 @@ package com.github.lernejo.korekto.grader.maven.parts;
 
 import com.github.lernejo.korekto.toolkit.GradePart;
 import com.github.lernejo.korekto.toolkit.PartGrader;
+import com.github.lernejo.korekto.toolkit.misc.OS;
+import com.github.lernejo.korekto.toolkit.misc.Processes;
 import com.github.lernejo.korekto.toolkit.thirdparty.git.GitContext;
 import com.github.lernejo.korekto.toolkit.thirdparty.git.GitNature;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +35,10 @@ public class Part1Grader implements PartGrader<LaunchingContext> {
     }
 
     public GradePart grade(LaunchingContext context) {
+        Path target = context.getExercise().getRoot().resolve("target");
+        if (Files.exists(target)) {
+            Processes.launch(OS.Companion.getCURRENT_OS().deleteDirectoryCommand(target));
+        }
         GitContext gitContext = context.getExercise().lookupNature(GitNature.class).get().getContext();
         List<String> mainCommits = gitContext.listOrderedCommits().stream().map(rc -> rc.getShortMessage()).collect(Collectors.toList());
         if (!context.equalator.equals(mainCommits, expectedCommitMessages)) {
