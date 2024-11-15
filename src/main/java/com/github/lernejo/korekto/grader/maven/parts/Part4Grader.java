@@ -4,6 +4,7 @@ import com.github.lernejo.korekto.toolkit.GradePart;
 import com.github.lernejo.korekto.toolkit.PartGrader;
 import com.github.lernejo.korekto.toolkit.thirdparty.markdown.Badge;
 import com.github.lernejo.korekto.toolkit.thirdparty.markdown.MarkdownFile;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -11,19 +12,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-public class Part4Grader implements PartGrader<LaunchingContext> {
+public record Part4Grader(String name, Double maxGrade) implements PartGrader<LaunchingContext> {
 
-    @Override
-    public String name() {
-        return "Part 4 - Badges";
-    }
-
-    @Nullable
-    @Override
-    public Double maxGrade() {
-        return 1.0;
-    }
-
+    @NotNull
     @Override
     public GradePart grade(LaunchingContext context) {
         MarkdownFile readme = new MarkdownFile(context.getExercise().getRoot().resolve("README.md"));

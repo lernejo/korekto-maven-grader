@@ -1,5 +1,5 @@
 # Exercice commencé
-Votre note est de **2**/4.
+Votre note est de **1**/4.
 
 ## Détail
 * Part 1 - Git: 0/1
@@ -20,7 +20,9 @@ Votre note est de **2**/4.
         * Add test to match 100% coverage
 
 
-* Part 2 - CI: 1/1
+* Part 2 - CI: 0/1
+    * No CI runs for `parts/5` branch, check https://github.com/lernejo/maven_training/actions
+
 * Part 3 - Coverage: 1/1
 * Part 4 - Badges: 0/1
     * Missing GitHub action Badge

@@ -6,6 +6,9 @@ import com.github.lernejo.korekto.toolkit.Grader;
 import com.github.lernejo.korekto.toolkit.GradingConfiguration;
 import com.github.lernejo.korekto.toolkit.PartGrader;
 import com.github.lernejo.korekto.toolkit.misc.HumanReadableDuration;
+import com.github.lernejo.korekto.toolkit.partgrader.GitHubActionsPartGrader;
+import com.github.lernejo.korekto.toolkit.partgrader.JacocoCoveragePartGrader;
+import com.github.lernejo.korekto.toolkit.partgrader.MavenCompileAndTestPartGrader;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +22,8 @@ public class MavenGrader implements Grader<LaunchingContext> {
     private final Logger logger = LoggerFactory.getLogger(MavenGrader.class);
 
     @Override
-    public void run(LaunchingContext context) {
-        context.getGradeDetails().getParts().addAll(grade(context));
+    public String name() {
+        return "Maven training";
     }
 
     @NotNull
@@ -29,27 +32,19 @@ public class MavenGrader implements Grader<LaunchingContext> {
         return new LaunchingContext(configuration);
     }
 
-    private Collection<? extends GradePart> grade(LaunchingContext context) {
-        return graders().stream()
-            .map(g -> applyPartGrader(context, g))
-            .collect(Collectors.toList());
+    @Override
+    public void run(LaunchingContext context) {
+        context.getGradeDetails().getParts().addAll(grade(context));
     }
 
-    private GradePart applyPartGrader(LaunchingContext context, PartGrader<LaunchingContext> g) {
-        long startTime = System.currentTimeMillis();
-        try {
-            return g.grade(context);
-        } finally {
-            logger.debug(g.name() + " in " + HumanReadableDuration.toString(System.currentTimeMillis() - startTime));
-        }
-    }
-
-    private Collection<PartGrader<LaunchingContext>> graders() {
+    @NotNull
+    @Override
+    public Collection<PartGrader<LaunchingContext>> graders() {
         return List.of(
-            new Part1Grader(),
-            new Part2Grader(),
-            new Part3Grader(),
-            new Part4Grader()
+            new Part1Grader("Part 1 - Git", 1.0D),
+            new GitHubActionsPartGrader<>("Part 2 - CI", 1.0D),
+            new Part3Grader("Part 3 - Coverage", 1.0D),
+            new Part4Grader("Part 4 - Badges", 1.0D)
         );
     }
 

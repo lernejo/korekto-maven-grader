@@ -1,5 +1,5 @@
 # Exercice commencé
-Votre note est de **1**/4.
+Votre note est de **0**/4.
 
 ## Détail
 * Part 1 - Git: 0/1
@@ -16,7 +16,9 @@ Votre note est de **1**/4.
         * Setup project layout
 
 
-* Part 2 - CI: 1/1
+* Part 2 - CI: 0/1
+    * No CI runs for `parts/1` branch, check https://github.com/lernejo/maven_training/actions
+
 * Part 3 - Coverage: 0/1
     * No JaCoCo report produced after `mvn test`, check tests and plugins
 
