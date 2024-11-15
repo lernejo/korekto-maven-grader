@@ -4,23 +4,13 @@ import com.github.lernejo.korekto.toolkit.GradePart;
 import com.github.lernejo.korekto.toolkit.PartGrader;
 import com.github.lernejo.korekto.toolkit.thirdparty.maven.MavenExecutor;
 import com.github.lernejo.korekto.toolkit.thirdparty.maven.MavenJacocoReport;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class Part3Grader implements PartGrader<LaunchingContext> {
+public record Part3Grader(String name, Double maxGrade) implements PartGrader<LaunchingContext> {
 
-    @Override
-    public String name() {
-        return "Part 3 - Coverage";
-    }
-
-    @Nullable
-    @Override
-    public Double maxGrade() {
-        return 1.0;
-    }
-
+    @NotNull
     @Override
     public GradePart grade(LaunchingContext context) {
         MavenExecutor.executeGoal(context.getExercise(), context.getConfiguration().getWorkspace(), "test");

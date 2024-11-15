@@ -6,13 +6,15 @@ import com.github.lernejo.korekto.toolkit.misc.OS;
 import com.github.lernejo.korekto.toolkit.misc.Processes;
 import com.github.lernejo.korekto.toolkit.thirdparty.git.GitContext;
 import com.github.lernejo.korekto.toolkit.thirdparty.git.GitNature;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Part1Grader implements PartGrader<LaunchingContext> {
+public record Part1Grader(String name, Double maxGrade) implements PartGrader<LaunchingContext> {
 
     private static final List<String> expectedCommitMessages = List.of(
         "Initial commit",
@@ -24,23 +26,14 @@ public class Part1Grader implements PartGrader<LaunchingContext> {
         "Add live badges"
     );
 
-    @Override
-    public String name() {
-        return "Part 1 - Git";
-    }
-
-    @Override
-    public Double maxGrade() {
-        return 1.0;
-    }
-
+    @NotNull
     public GradePart grade(LaunchingContext context) {
         Path target = context.getExercise().getRoot().resolve("target");
         if (Files.exists(target)) {
             Processes.launch(OS.Companion.getCURRENT_OS().deleteDirectoryCommand(target));
         }
         GitContext gitContext = context.getExercise().lookupNature(GitNature.class).get().getContext();
-        List<String> mainCommits = gitContext.listOrderedCommits().stream().map(rc -> rc.getShortMessage()).collect(Collectors.toList());
+        List<String> mainCommits = gitContext.listOrderedCommits().stream().map(RevCommit::getShortMessage).collect(Collectors.toList());
         if (!context.equalator.equals(mainCommits, expectedCommitMessages)) {
             String formattedExpectedCommits = expectedCommitMessages.stream().collect(Collectors.joining("\n        * ", "\n        * ", "\n"));
             String formattedActualCommits = mainCommits.stream().collect(Collectors.joining("\n        * ", "\n        * ", "\n"));
